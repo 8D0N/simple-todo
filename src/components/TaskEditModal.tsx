@@ -13,7 +13,7 @@ export function TaskEditModal({ task, categories, onClose, onTaskUpdated }: Task
     const [title, setTitle] = useState(task.title);
     const [description, setDescription] = useState(task.description || "");
     const [priority, setPriority] = useState(task.priority || "");
-    const [dueDate, setDueDate] = useState(task.dueDate?.split("T")[0] || "");
+    const [dueDate, setDueDate] = useState(task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : "");
     const [categoryId, setCategoryId] = useState(task.categoryId?.toString() || "");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -24,11 +24,13 @@ export function TaskEditModal({ task, categories, onClose, onTaskUpdated }: Task
         setError(null);
 
         try {
+            const formattedDueDate = dueDate ? new Date(dueDate).toISOString() : undefined;
+
             await updateTask(task.id, {
                 title,
                 description: description || undefined,
                 priority: priority as "HIGH" | "MEDIUM" | "LOW" | undefined,
-                dueDate: dueDate || undefined,
+                dueDate: formattedDueDate,
                 categoryId: categoryId ? Number(categoryId) : undefined,
             });
             await onTaskUpdated();
@@ -75,10 +77,10 @@ export function TaskEditModal({ task, categories, onClose, onTaskUpdated }: Task
                             <select
                                 id="priority"
                                 value={priority}
-                                onChange={(e) => setPriority(e.target.value)}
+                                onChange={(e) => setPriority(e.target.value as "HIGH" | "MEDIUM" | "LOW" | "")}
                                 className="input"
                             >
-                                <option value="">選択してください</option>
+                                <option value="">なし</option>
                                 <option value="HIGH">高</option>
                                 <option value="MEDIUM">中</option>
                                 <option value="LOW">低</option>
@@ -93,7 +95,7 @@ export function TaskEditModal({ task, categories, onClose, onTaskUpdated }: Task
                                 onChange={(e) => setCategoryId(e.target.value)}
                                 className="input"
                             >
-                                <option value="">選択してください</option>
+                                <option value="">なし</option>
                                 {categories.map((category) => (
                                     <option key={category.id} value={category.id}>
                                         {category.name}

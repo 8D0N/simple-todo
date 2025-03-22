@@ -24,7 +24,7 @@ export default function CategoriesPage() {
             const data = await response.json();
             setCategories(data);
         } catch (error) {
-            toast.error('カテゴリの取得に失敗しました');
+            toast.error(error instanceof Error ? error.message : 'カテゴリの取得に失敗しました');
         }
     };
 
@@ -42,7 +42,7 @@ export default function CategoriesPage() {
             setNewCategory({ name: '', color: '#3B82F6' });
             toast.success('カテゴリを作成しました');
         } catch (error) {
-            toast.error('カテゴリの作成に失敗しました');
+            toast.error(error instanceof Error ? error.message : 'カテゴリの作成に失敗しました');
         } finally {
             setIsLoading(false);
         }
@@ -58,7 +58,7 @@ export default function CategoriesPage() {
             await fetchCategories();
             toast.success('カテゴリを削除しました');
         } catch (error) {
-            toast.error('カテゴリの削除に失敗しました');
+            toast.error(error instanceof Error ? error.message : 'カテゴリの削除に失敗しました');
         }
     };
 
