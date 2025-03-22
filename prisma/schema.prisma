@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int        @id @default(autoincrement())
+  email     String     @unique
+  password  String
+  name      String
+  tasks     Task[]
+  categories Category[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Task {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?
+  completed   Boolean   @default(false)
+  priority    Priority?
+  dueDate     DateTime?
+  category    Category? @relation(fields: [categoryId], references: [id])
+  categoryId  Int?
+  user        User      @relation(fields: [userId], references: [id])
+  userId      Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([id, userId])
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String
+  color     String
+  tasks     Task[]
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([id, userId])
+}
+
+model ErrorLog {
+  id        Int      @id @default(autoincrement())
+  code      Int
+  message   String
+  stack     String?
+  requestId String   @unique
+  userId    String?
+  details   String?
+  timestamp DateTime
+  createdAt DateTime @default(now())
+
+  @@index([timestamp])
+  @@index([code])
+  @@index([userId])
+}
+
+enum Priority {
+  HIGH
+  MEDIUM
+  LOW
+}
